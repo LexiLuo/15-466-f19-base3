@@ -1,8 +1,10 @@
-# (TODO: your game's title)
+Find your car
 
-Author: (TODO: your name)
+Author: Xuechun Luo
 
-Design: (TODO: In two sentences or fewer, describe what is new and interesting about your game.)
+Design: 
+
+Explore the 3D scenes with your keyboard, follow the hints to find your car
 
 Screen Shot:
 
@@ -10,10 +12,11 @@ Screen Shot:
 
 How To Play:
 
-(TODO: describe the controls and (if needed) goals/strategy.)
+The user uses the keyboard to take UP,DOWN,LEFT,RIGHT movement and follows the hints to find his car.
 
 Sources:
 
-(TODO: fill in information about the sources of any **artwork** or **sounds** you used in the game that you did not create yourself. Feel free to also credit yourself for things you did make.)
+Car Model from: https://kenney.nl/assets/racing-kit
+Other Models from city.blend in this project
 
 This game was built with [NEST](NEST.md).

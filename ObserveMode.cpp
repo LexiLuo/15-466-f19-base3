@@ -19,14 +19,14 @@ Load< SpriteAtlas > trade_font_atlas(LoadTagDefault, []() -> SpriteAtlas const *
 
 GLuint meshes_for_lit_color_texture_program = 0;
 static Load< MeshBuffer > meshes(LoadTagDefault, []() -> MeshBuffer const * {
-	MeshBuffer *ret = new MeshBuffer(data_path("city.pnct"));
+	MeshBuffer *ret = new MeshBuffer(data_path("park.pnct"));
 	meshes_for_lit_color_texture_program = ret->make_vao_for_program(lit_color_texture_program->program);
 	return ret;
 });
 
 static Load< Scene > scene(LoadTagLate, []() -> Scene const * {
 	Scene *ret = new Scene();
-	ret->load(data_path("city.scene"), [](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
+	ret->load(data_path("park.scene"), [](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
 		auto &mesh = meshes->lookup(mesh_name);
 		scene.drawables.emplace_back(transform);
 		Scene::Drawable::Pipeline &pipeline = scene.drawables.back().pipeline;
@@ -42,8 +42,11 @@ static Load< Scene > scene(LoadTagLate, []() -> Scene const * {
 
 ObserveMode::ObserveMode() {
 	assert(scene->cameras.size() && "Observe requires cameras.");
-
-	current_camera = &scene->cameras.front();
+	auto ci = scene->cameras.begin();
+	++ci; 
+	++ci;
+	++ci;
+	current_camera = &*ci;
 
 	noise_loop = Sound::loop_3D(*noise, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), 10.0f);
 }
@@ -53,24 +56,121 @@ ObserveMode::~ObserveMode() {
 }
 
 bool ObserveMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
-	if (evt.type == SDL_KEYDOWN) {
-		if (evt.key.keysym.sym == SDLK_LEFT) {
-			auto ci = scene->cameras.begin();
-			while (ci != scene->cameras.end() && &*ci != current_camera) ++ci;
-			if (ci == scene->cameras.begin()) ci = scene->cameras.end();
-			--ci;
-			current_camera = &*ci;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_RIGHT) {
-			auto ci = scene->cameras.begin();
-			while (ci != scene->cameras.end() && &*ci != current_camera) ++ci;
-			if (ci != scene->cameras.end()) ++ci;
-			if (ci == scene->cameras.end()) ci = scene->cameras.begin();
-			current_camera = &*ci;
-
-			return true;
-		}
+	int index = 0;
+	auto pointer = scene->cameras.begin();
+	while (pointer != scene->cameras.end() && &*pointer != current_camera){
+		++pointer;
+		++index;
 	}
+	switch(index){
+		case 3:
+			if(evt.key.keysym.sym == SDLK_UP){
+				auto ci = scene->cameras.begin();
+				++ci;
+				++ci;
+				++ci;
+				++ci;
+				current_camera = &*ci;
+				return true;
+			}
+			break;
+		case 2:
+			if (evt.key.keysym.sym == SDLK_UP) {
+				auto ci = scene->cameras.begin();
+				current_camera = &*ci;
+				return true;
+			} else if (evt.key.keysym.sym == SDLK_RIGHT) {
+				auto ci = scene->cameras.begin();
+				++ci;
+				++ci;
+				++ci;
+				++ci;
+				if (ci == scene->cameras.end()) ci = scene->cameras.begin();
+                current_camera = &*ci;
+				return true;
+			}
+			break;
+		case 5:
+			if (evt.key.keysym.sym == SDLK_UP) {
+				auto ci = scene->cameras.begin();
+				current_camera = &*ci;
+				return true;
+			} else if (evt.key.keysym.sym == SDLK_LEFT) {
+				auto ci = scene->cameras.begin();
+				++ci;
+				++ci;
+				++ci;
+				++ci;
+				current_camera = &*ci;
+				return true;
+			}
+			break;
+		case 4:
+			if (evt.key.keysym.sym == SDLK_LEFT) {
+				auto ci = scene->cameras.begin();
+				++ci;
+				++ci;
+				current_camera = &*ci;
+				return true;
+			} else if (evt.key.keysym.sym == SDLK_RIGHT) {
+				auto ci = scene->cameras.begin();
+				++ci;
+				++ci;
+				++ci;
+				++ci;
+				++ci;
+				current_camera = &*ci;
+				return true;
+			}
+			break;
+		case 0:
+			if (evt.key.keysym.sym == SDLK_LEFT || evt.key.keysym.sym == SDLK_RIGHT || evt.key.keysym.sym == SDLK_UP) {
+				auto ci = scene->cameras.begin();
+				++ci;
+				current_camera = &*ci;
+				return true;
+			} else if (evt.key.keysym.sym == SDLK_DOWN) {
+				auto ci = scene->cameras.begin();
+				++ci;
+				++ci;
+				++ci;
+				++ci;
+				current_camera = &*ci;
+				return true;
+			}
+			break;
+		case 1:
+			if (evt.key.keysym.sym == SDLK_LEFT) {
+				auto ci = scene->cameras.begin();
+				++ci;
+				current_camera = &*ci;
+				return true;
+			} else if (evt.key.keysym.sym == SDLK_RIGHT) {
+				auto ci = scene->cameras.begin();
+				++ci;
+				current_camera = &*ci;
+				return true;
+			}
+			break;
+
+	}
+	// if (evt.type == SDL_KEYDOWN) {
+	// 	if (evt.key.keysym.sym == SDLK_LEFT) {
+	// 		auto ci = scene->cameras.begin();
+	// 		while (ci != scene->cameras.end() && &*ci != current_camera) ++ci;
+	// 		if (ci == scene->cameras.begin()) ci = scene->cameras.end();
+	// 		--ci;
+	// 		current_camera = &*ci;
+	// 		return true;
+	// 	} else if (evt.key.keysym.sym == SDLK_RIGHT) {
+	// 		auto ci = scene->cameras.begin();
+	// 		while (ci != scene->cameras.end() && &*ci != current_camera) ++ci;
+	// 		if (ci != scene->cameras.end()) ++ci;
+	// 		if (ci == scene->cameras.end()) ci = scene->cameras.begin();
+	// 		current_camera = &*ci;
+
+	// 		return true;
+	// 	}
 	
 	return false;
 }
@@ -111,8 +211,26 @@ void ObserveMode::draw(glm::uvec2 const &drawable_size) {
 		glBlendEquation(GL_FUNC_ADD);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		DrawSprites draw(*trade_font_atlas, glm::vec2(0,0), glm::vec2(320, 200), drawable_size, DrawSprites::AlignPixelPerfect);
-
-		std::string help_text = "--- SWITCH CAMERAS WITH LEFT/RIGHT ---";
+        std::string help_text = "";
+	    int index = 0;
+		auto pointer = scene->cameras.begin();
+		while (pointer != scene->cameras.end() && &*pointer != current_camera){
+			++pointer;
+			index ++;
+		}
+		if(index == 1){
+			help_text = "You find your car!";
+		}else if(index ==2){
+			help_text = "There is no way out, let's climb higher";
+		}else if(index == 3){
+			help_text = "I cannot find my car. Let's try move forward";
+		}else if(index == 4){
+			help_text = "We can try turn right or left";
+		}else if(index == 0){
+			help_text = "I see my car there! Let's go!";
+		}else if(index == 5){
+			help_text = "There is nothing in the garage, let's climb higher";
+		}
 		glm::vec2 min, max;
 		draw.get_text_extents(help_text, glm::vec2(0.0f, 0.0f), 1.0f, &min, &max);
 		float x = std::round(160.0f - (0.5f * (max.x + min.x)));
